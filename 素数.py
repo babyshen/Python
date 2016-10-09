@@ -11,7 +11,7 @@ def prime_number(num):
         if num%x==0:
             res = False
             return res
-        return res
+    return res
 
 print([x for x in range(100) if prime_number(x)])
 
