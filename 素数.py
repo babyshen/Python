@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 #方法一：
+#这效率比较低，追求效率的话可以试试下一个方法
 def prime_number(num):
     res = True
     if num <= 1:
@@ -16,6 +17,7 @@ def prime_number(num):
 print([x for x in range(100) if prime_number(x)])
 
 #方法二：
+#如果要追求一下速度的话，可以试试这个(求1千万内素数14秒左右秒).
 def getPrime(maxNum):
     aList = [x for x in range(0, maxNum)]
     prime = []
