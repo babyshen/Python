@@ -33,3 +33,18 @@ def clear(aPrime, aList, maxNum):
             aList[i * aPrime] = 0
 
 print(getPrime(100))
+
+#方法三
+def fun(max):
+    l = []
+    a = [x for x in range(max + 1)]
+    for i in range(2, max):
+        if a[i]:
+            l.append(a[i])
+            for j in range(2, int(max/a[i])+1):
+                if j * a[i] <= max - 1:
+                    a[a[i] * j] = 0
+    print(l)
+
+fun(10000000)
+
