@@ -35,6 +35,7 @@ def clear(aPrime, aList, maxNum):
 print(getPrime(100))
 
 #方法三
+#这个和方法二差不多，只是把两个函数合并在一块了
 def fun(max):
     l = []
     a = list(range(max + 1))
