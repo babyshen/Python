@@ -37,7 +37,7 @@ print(getPrime(100))
 #方法三
 def fun(max):
     l = []
-    a = [x for x in range(max + 1)]
+    a = list(range(max + 1))
     for i in range(2, max):
         if a[i]:
             l.append(a[i])
