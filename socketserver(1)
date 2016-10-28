@@ -62,7 +62,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         if not cmd_res:
             cmd_res = "ls has no output"
         self.request.send(str(len(cmd_res.encode("utf-8"))).encode("utf-8"))  # 先发大小给客户端
-        print(cmd_res)
+        #print(cmd_res)
         server_response = self.request.recv(1024)
         self.request.send(cmd_res.encode("utf-8"))
 
