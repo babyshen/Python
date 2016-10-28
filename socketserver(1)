@@ -1,4 +1,6 @@
-# 实现多线程简易ftp，目前支持下载和上传(支持md5校验)（暂不支持切换目录，ls等，对于文件不存在或权限问题未做任何操作）
+# 实现多线程简易ftp，目前支持下载(get)、上传(put)、列出服务端目录文件(ls)和列出本地目录文件(lls)
+#(下载和上传支持md5校验)（暂不支持切换目录等，对于文件不存在或权限等问题处理有待改善）
+
 # ftp_server_start
 
 #!/usr/bin/env python
@@ -21,7 +23,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.request.send(b'200 ok')
         received_size = 0
         while received_size < filesize :
-            if filesize - received_size > 1024: #  要收不止一次,为了防止粘包
+            if filesize - received_size > 1024: #  要收不止一次,
                 size = 1024
             else: # 最后一次，剩多少收多少
                 size = filesize - received_size
@@ -54,6 +56,16 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             self.request.send(m.hexdigest().encode("utf-8"))  # send md5
         print("send done...")
 
+    def ls(self,*args):
+        cmd_dic = args[0]
+        cmd_res = os.popen("ls").read()
+        if not cmd_res:
+            cmd_res = "ls has no output"
+        self.request.send(str(len(cmd_res.encode("utf-8"))).encode("utf-8"))  # 先发大小给客户端
+        print(cmd_res)
+        server_response = self.request.recv(1024)
+        self.request.send(cmd_res.encode("utf-8"))
+
     def handle(self):
         while True:
             try:
@@ -71,17 +83,18 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
 if __name__ == "__main__":
     try:
-        HOST, PORT = "localhost", 9999
+        HOST, PORT = "0.0.0.0", 9999
         server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
         server.serve_forever()
     except KeyboardInterrupt as e:
-        sys.exit()
-    
+        sys.exit("")
+
 # ftp_server_end
 
 ========================================分割线========================================
 
 # ftp_client_start
+
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
@@ -92,13 +105,14 @@ class FtpClient(object):
         self.client = socket.socket()
     def help(self):
         msg ='''
+        ls
         get filename
         put filename
         '''
         print(msg)
 
-    def connect(self,HOST,PORT,*args,**kwargs):
-        self.client.connect((HOST,PORT))
+    def connect(self,ip,port,*args,**kwargs):
+        self.client.connect((ip, port))
 
     def interactive(self):
         while True:
@@ -173,6 +187,29 @@ class FtpClient(object):
         print("server file md5:",server_file_md5.decode())
         print("client file md5:",new_file_md5)
 
+    def cmd_ls(self,*args):
+        msg_dic = {
+            "action": "ls",
+        }
+        self.client.send(json.dumps(msg_dic).encode("utf-8"))
+        cmd_res_size = self.client.recv(1024)
+        self.client.send(b"yes")
+        received_size = 0
+        received_data = b''
+        while received_size < int(cmd_res_size.decode()):  # 判断接收长度，直到接收完毕
+            data = self.client.recv(1024)
+            received_size += len(data)
+            received_data += data
+        else:
+            print(received_data.decode())
+            print("ls receive done..")
+
+    def cmd_lls(self, *args):
+        cmd_res = os.popen("ls").read()
+        if not cmd_res:
+            cmd_res = "ls has no output"
+        print(cmd_res)
+        
 if __name__ == "__main__":
     try:
         ftp = FtpClient()
@@ -181,6 +218,6 @@ if __name__ == "__main__":
     except ConnectionRefusedError  as e :
         sys.exit("Connection refused!")
     except KeyboardInterrupt as e:
-        sys.exit()
+        sys.exit("")
     
 #ftp_client_end
