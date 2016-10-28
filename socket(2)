@@ -1,5 +1,5 @@
 """
-soceket 简易ftp工具，已实现MD5校验
+socket 简易ftp工具，只支持下载暂不支持上传，已实现MD5校验
 """
 
 #server_start
