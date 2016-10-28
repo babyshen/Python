@@ -1,0 +1,174 @@
+# 实现多线程简易ftp，目前支持下载和上传(支持md5校验)（暂不支持切换目录，ls等，对于文件不存在或权限问题未做任何操作）
+# ftp_server_start
+
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import socketserver,json,os,hashlib
+
+class MyTCPHandler(socketserver.BaseRequestHandler):
+
+    def put(self,*args):
+        '''接受客户端文件'''
+        cmd_dic = args[0]
+        filename = cmd_dic["filename"]
+        filesize = cmd_dic["size"]
+        if os.path.isfile(filename):
+            f = open(filename+".new",'wb')
+        else:
+            f = open(filename, 'wb')
+        m = hashlib.md5()
+        self.request.send(b'200 ok')
+        received_size = 0
+        while received_size < filesize :
+            data = self.request.recv(1024)
+            m.update(data)
+            f.write(data)
+            received_size += len(data)
+        else:
+            print("file [%s] has uploaded" % filename)
+        f.close()
+        new_file_md5 = m.hexdigest()
+        client_file_md5 = self.request.recv(1024)
+        print("client file md5:", client_file_md5.decode())
+        print("server file md5:", new_file_md5)
+
+    def get(self, *args):
+        cmd_dic = args[0]
+        filename = cmd_dic["filename"]
+        filesize = os.stat(filename).st_size
+        print(filename)
+        self.request.send(str(filesize).encode("utf-8"))# send file size
+        if os.path.isfile(filename):
+            f = open(filename,'rb')
+            m = hashlib.md5()
+            for line in f:
+                m.update(line)
+                self.request.send(line)
+            print("file md5", m.hexdigest())
+            f.close()
+            self.request.send(m.hexdigest().encode("utf-8"))  # send md5
+        print("send done...")
+
+    def handle(self):
+        while True:
+            try:
+                self.data = self.request.recv(1024).strip()
+                print("{} wrote:".format(self.client_address[0]))
+               # print(self.data)
+                cmd_dic = json.loads(self.data.decode())
+                action = cmd_dic["action"]
+                if hasattr(self,action):
+                    func = getattr(self,action)
+                    func(cmd_dic)
+            except ConnectionResetError as e:
+                print("err,",e)
+                break
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
+    server.serve_forever()
+    
+# ftp_server_end
+
+========================================分割线========================================
+
+# ftp_client_start
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import socket,os,json,hashlib
+
+class FtpClient(object):
+    def __init__(self):
+        self.client = socket.socket()
+    def help(self):
+        msg ='''
+        get filename
+        put filename
+        '''
+        print(msg)
+
+    def connect(self,ip,port,*args,**kwargs):
+        self.client.connect((ip, port))
+
+    def interactive(self):
+        while True:
+            cmd = input(">>: ").strip()
+            if not cmd:continue
+            cmd_str = cmd.split()[0]
+            if hasattr(self,"cmd_%s" %cmd_str):
+                func = getattr(self,"cmd_%s" %cmd_str)
+                func(cmd)
+            else:
+                self.help()
+
+    def cmd_put(self,*args):
+        cmd_split = args[0].split()
+        if len(cmd_split) > 1 :
+            filename = cmd_split[1]
+            if os.path.isfile(filename):
+                filesize = os.stat(filename).st_size
+                msg_dic = {
+                    "action":"put",
+                    "filename":filename,
+                    "size":filesize,
+                 #   "overridden":True
+                }
+                self.client.send(json.dumps(msg_dic).encode("utf-8"))
+                #  防止粘包，等待服务器确认
+                server_response = self.client.recv(1024)
+                f = open(filename,'rb')
+                m = hashlib.md5()
+                for line in f:
+                    m.update(line)
+                    self.client.send(line)
+                else:
+                    print("file upload success...")
+                    f.close()
+                print("file md5", m.hexdigest())
+                self.client.send(m.hexdigest().encode("utf-8"))
+            else:
+                print(filename,"is not exist")
+    def cmd_get(self,*args):
+        cmd_split = args[0].split()
+        if len(cmd_split) > 1:
+            filename = cmd_split[1]
+        msg_dic = {
+            "action": "get",
+            "filename": filename,
+            #"size": filesize,
+            #"overridden": True
+        }
+        self.client.send(json.dumps(msg_dic).encode("utf-8"))
+        #  防止粘包，等待服务器确认
+        server_response = self.client.recv(1024)
+        file_total_size = int(server_response.decode())
+        received_size = 0
+        f = open(filename+".new",'wb')
+        m = hashlib.md5()
+        while received_size < file_total_size :
+            if file_total_size - received_size > 1024: #  要收不止一次
+                size = 1024
+            else: # 最后一次，剩多少收多少
+                size = file_total_size - received_size
+            data = self.client.recv(size)
+            received_size += len(data)
+            m.update(data)
+            f.write(data)
+            #print(file_total_size,received_size)
+        else:
+            new_file_md5 = m.hexdigest()
+            print("file recv done...")
+        f.close()
+        server_file_md5 = self.client.recv(1024)
+        print("server file md5:",server_file_md5.decode())
+        print("client file md5:",new_file_md5)
+
+if __name__ == "__main__":
+    ftp = FtpClient()
+    ftp.connect('localhost', 9999)
+    ftp.interactive()
+    
+#ftp_client_end
