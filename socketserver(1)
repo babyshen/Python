@@ -21,7 +21,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.request.send(b'200 ok')
         received_size = 0
         while received_size < filesize :
-            data = self.request.recv(1024)
+            if filesize - received_size > 1024: #  要收不止一次,为了防止粘包
+                size = 1024
+            else: # 最后一次，剩多少收多少
+                size = filesize - received_size
+            data = self.request.recv(size)
             m.update(data)
             f.write(data)
             received_size += len(data)
