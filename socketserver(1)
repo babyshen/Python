@@ -97,8 +97,8 @@ class FtpClient(object):
         '''
         print(msg)
 
-    def connect(self,ip,port,*args,**kwargs):
-        self.client.connect((ip, port))
+    def connect(self,HOST,PORT,*args,**kwargs):
+        self.client.connect((HOST,PORT))
 
     def interactive(self):
         while True:
