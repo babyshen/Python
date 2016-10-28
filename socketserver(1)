@@ -105,7 +105,8 @@ class FtpClient(object):
         self.client = socket.socket()
     def help(self):
         msg ='''
-        ls
+        ls  # list server file
+        lls # list client file
         get filename
         put filename
         '''
