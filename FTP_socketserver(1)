@@ -1,4 +1,4 @@
-# 实现多线程简易ftp，目前支持下载(get)、上传(put)、列出服务端目录文件(ls)和列出本地目录文件(lls)
+# 实现多线程简易ftp，目前支持下载(get)、上传(put)、列出服务端目录文件(ls)和列出本地目录文件(lls)，查看本地和服务端当前所在目录
 #(下载和上传支持md5校验)（暂不支持切换目录等，对于文件不存在或权限等问题处理有待改善）
 #下载的文件在当前client运行目录，上传的文件在server运行目录
 
@@ -76,6 +76,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 cmd_res = "ls has no output"
                 getattr(self,"list")(cmd_res)
 
+    def pwd(self,*args):
+        cmd_dic = args[0]
+        cmd_res = os.getcwd()
+        self.request.send(cmd_res.encode("utf-8"))
+
     def handle(self):
         while True:
             try:
@@ -118,6 +123,8 @@ class FtpClient(object):
         msg = '''
         ls  # list server file
         lls # list client file
+        pwd
+        lpwd
         get filename
         put filename
         '''
@@ -238,7 +245,22 @@ class FtpClient(object):
                     print(file)
             else:
                 print(" %s : No such directory" % dir_file)
+               
+    def cmd_pwd(self,*args):
+        cmd_split = args[0].split()
+        if len(cmd_split) == 1:
+            msg_dic = {
+                "action": "pwd",
+            }
+            self.client.send(json.dumps(msg_dic).encode("utf-8"))
+            cmd_res = self.client.recv(1024)
+            print(cmd_res.decode())
 
+    def cmd_lpwd(self,*args):
+        cmd_split = args[0].split()
+        if len(cmd_split) == 1:
+            cmd_res = os.getcwd()
+            print(cmd_res)
 
 if __name__ == "__main__":
     try:
