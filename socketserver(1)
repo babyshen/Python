@@ -1,5 +1,6 @@
 # 实现多线程简易ftp，目前支持下载(get)、上传(put)、列出服务端目录文件(ls)和列出本地目录文件(lls)
 #(下载和上传支持md5校验)（暂不支持切换目录等，对于文件不存在或权限等问题处理有待改善）
+#下载的文件在当前client运行目录，上传的文件在server运行目录
 
 # ftp_server_start
 
@@ -16,7 +17,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         filename = cmd_dic["filename"]
         filesize = cmd_dic["size"]
         if os.path.isfile(filename):
-            f = open(filename+".new",'wb')
+            f = open(os.path.basename(filename) + ".new",'wb')
         else:
             f = open(filename, 'wb')
         m = hashlib.md5()
@@ -56,15 +57,24 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             self.request.send(m.hexdigest().encode("utf-8"))  # send md5
         print("send done...")
 
+    def list(self,cmd_res):
+        self.request.send(str(len(cmd_res)).encode("utf-8")) # 先发大小给客户端
+        server_response = self.request.recv(1024)
+        self.request.send(str(cmd_res).encode("utf-8"))
+
     def ls(self,*args):
         cmd_dic = args[0]
-        cmd_res = os.popen("ls").read()
-        if not cmd_res:
-            cmd_res = "ls has no output"
-        self.request.send(str(len(cmd_res.encode("utf-8"))).encode("utf-8"))  # 先发大小给客户端
-        #print(cmd_res)
-        server_response = self.request.recv(1024)
-        self.request.send(cmd_res.encode("utf-8"))
+        dir_file = cmd_dic["filename"]
+        if not dir_file:
+            cmd_res = os.listdir()
+            getattr(self, "list")(cmd_res)
+        else:
+            if os.path.isdir(dir_file):
+                cmd_res = os.listdir(dir_file)
+                getattr(self, "list")(cmd_res)
+            else:
+                cmd_res = "ls has no output"
+                getattr(self,"list")(cmd_res)
 
     def handle(self):
         while True:
@@ -89,8 +99,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         sys.exit("")
 
-# ftp_server_end
-
 ========================================分割线========================================
 
 # ftp_client_start
@@ -98,13 +106,16 @@ if __name__ == "__main__":
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import socket,os,json,hashlib,sys
+
+import socket, os, json, hashlib, sys
+
 
 class FtpClient(object):
     def __init__(self):
         self.client = socket.socket()
+
     def help(self):
-        msg ='''
+        msg = '''
         ls  # list server file
         lls # list client file
         get filename
@@ -112,36 +123,36 @@ class FtpClient(object):
         '''
         print(msg)
 
-    def connect(self,ip,port,*args,**kwargs):
+    def connect(self, ip, port, *args, **kwargs):
         self.client.connect((ip, port))
 
     def interactive(self):
         while True:
             cmd = input(">>: ").strip()
-            if not cmd:continue
+            if not cmd: continue
             cmd_str = cmd.split()[0]
-            if hasattr(self,"cmd_%s" %cmd_str):
-                func = getattr(self,"cmd_%s" %cmd_str)
+            if hasattr(self, "cmd_%s" % cmd_str):
+                func = getattr(self, "cmd_%s" % cmd_str)
                 func(cmd)
             else:
                 self.help()
 
-    def cmd_put(self,*args):
+    def cmd_put(self, *args):
         cmd_split = args[0].split()
-        if len(cmd_split) > 1 :
+        if len(cmd_split) > 1:
             filename = cmd_split[1]
             if os.path.isfile(filename):
                 filesize = os.stat(filename).st_size
                 msg_dic = {
-                    "action":"put",
-                    "filename":filename,
-                    "size":filesize,
-                 #   "overridden":True
+                    "action": "put",
+                    "filename": filename,
+                    "size": filesize,
+                    #   "overridden":True
                 }
                 self.client.send(json.dumps(msg_dic).encode("utf-8"))
                 #  防止粘包，等待服务器确认
                 server_response = self.client.recv(1024)
-                f = open(filename,'rb')
+                f = open(filename, 'rb')
                 m = hashlib.md5()
                 for line in f:
                     m.update(line)
@@ -152,45 +163,52 @@ class FtpClient(object):
                 print("file md5", m.hexdigest())
                 self.client.send(m.hexdigest().encode("utf-8"))
             else:
-                print(filename,"is not exist")
-    def cmd_get(self,*args):
+                print(filename, "is not exist")
+
+    def cmd_get(self, *args):
         cmd_split = args[0].split()
         if len(cmd_split) > 1:
             filename = cmd_split[1]
         msg_dic = {
             "action": "get",
             "filename": filename,
-            #"size": filesize,
-            #"overridden": True
+            # "size": filesize,
+            # "overridden": True
         }
         self.client.send(json.dumps(msg_dic).encode("utf-8"))
         #  防止粘包，等待服务器确认
         server_response = self.client.recv(1024)
         file_total_size = int(server_response.decode())
         received_size = 0
-        f = open(filename+".new",'wb')
+        f = open(os.path.basename(filename) + ".new", 'wb')
         m = hashlib.md5()
-        while received_size < file_total_size :
-            if file_total_size - received_size > 1024: #  要收不止一次
+        while received_size < file_total_size:
+            if file_total_size - received_size > 1024:  # 要收不止一次
                 size = 1024
-            else: # 最后一次，剩多少收多少
+            else:  # 最后一次，剩多少收多少
                 size = file_total_size - received_size
             data = self.client.recv(size)
             received_size += len(data)
             m.update(data)
             f.write(data)
-            #print(file_total_size,received_size)
+            # print(file_total_size,received_size)
         else:
             new_file_md5 = m.hexdigest()
             print("file recv done...")
         f.close()
         server_file_md5 = self.client.recv(1024)
-        print("server file md5:",server_file_md5.decode())
-        print("client file md5:",new_file_md5)
+        print("server file md5:", server_file_md5.decode())
+        print("client file md5:", new_file_md5)
 
-    def cmd_ls(self,*args):
+    def cmd_ls(self, *args):
+        cmd_split = args[0].split()
+        if len(cmd_split) > 1:
+            dire_file = cmd_split[1]
+        else:
+            dire_file = ""
         msg_dic = {
             "action": "ls",
+            "filename": dire_file,
         }
         self.client.send(json.dumps(msg_dic).encode("utf-8"))
         cmd_res_size = self.client.recv(1024)
@@ -202,23 +220,34 @@ class FtpClient(object):
             received_size += len(data)
             received_data += data
         else:
-            print(received_data.decode())
+            for file in received_data.decode().lstrip('[').rstrip(']').split(','):
+                print(file)
             print("ls receive done..")
 
     def cmd_lls(self, *args):
-        cmd_res = os.popen("ls").read()
-        if not cmd_res:
-            cmd_res = "ls has no output"
-        print(cmd_res)
-        
+        cmd_split = args[0].split()
+        if len(cmd_split) == 1:
+            cmd_res = os.listdir()
+            for file in cmd_res:
+                print(file)
+        elif len(cmd_split)  > 1 :
+            dir_file = cmd_split[1]
+            if os.path.isdir(dir_file):
+                cmd_res = os.listdir(dir_file)
+                for file in cmd_res:
+                    print(file)
+            else:
+                print(" %s : No such directory" % dir_file)
+
+
 if __name__ == "__main__":
     try:
         ftp = FtpClient()
         ftp.connect('localhost', 9999)
         ftp.interactive()
-    except ConnectionRefusedError  as e :
+    except ConnectionRefusedError  as e:
         sys.exit("Connection refused!")
     except KeyboardInterrupt as e:
         sys.exit("")
-    
+
 #ftp_client_end
