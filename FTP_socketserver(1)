@@ -114,6 +114,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         sys.exit("")
 
+# ftp_server_end
 
 ========================================分割线========================================
 
@@ -289,6 +290,8 @@ class FtpClient(object):
             self.client.send(json.dumps(msg_dic).encode("utf-8"))
             cmd_res = self.client.recv(1024)
             print(cmd_res.decode())
+        else:
+            self.help()
 
     def cmd_lchdir(self,*args):
         cmd_split = args[0].split()
@@ -296,6 +299,8 @@ class FtpClient(object):
             dirname = cmd_split[1]
             os.chdir(dirname)
             print(os.getcwd())
+        else:
+            self.help()
 
 if __name__ == "__main__":
     try:
