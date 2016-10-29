@@ -17,7 +17,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         filename = cmd_dic["filename"]
         filesize = cmd_dic["size"]
         if os.path.isfile(filename):
-            f = open(os.path.basename(filename) + ".new",'wb')
+            f = open(filename+".new",'wb')
         else:
             f = open(filename, 'wb')
         m = hashlib.md5()
@@ -81,6 +81,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         cmd_res = os.getcwd()
         self.request.send(cmd_res.encode("utf-8"))
 
+    def chdir(self,*args):
+        cmd_dic = args[0]
+        dirname = cmd_dic["dirname"]
+        os.chdir(dirname)
+        self.request.send(os.getcwd().encode("utf-8"))
+
     def handle(self):
         while True:
             try:
@@ -104,6 +110,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         sys.exit("")
 
+
 ========================================分割线========================================
 
 # ftp_client_start
@@ -123,8 +130,10 @@ class FtpClient(object):
         msg = '''
         ls  # list server file
         lls # list client file
-        pwd
-        lpwd
+        gwd
+        lgwd
+        chdir dirname
+        lchdir dirname
         get filename
         put filename
         '''
@@ -187,7 +196,10 @@ class FtpClient(object):
         server_response = self.client.recv(1024)
         file_total_size = int(server_response.decode())
         received_size = 0
-        f = open(os.path.basename(filename) + ".new", 'wb')
+        if os.path.isfile(filename):
+            f = open(filename+".new",'wb')
+        else:
+            f = open(filename, 'wb')
         m = hashlib.md5()
         while received_size < file_total_size:
             if file_total_size - received_size > 1024:  # 要收不止一次
@@ -245,7 +257,7 @@ class FtpClient(object):
                     print(file)
             else:
                 print(" %s : No such directory" % dir_file)
-               
+
     def cmd_pwd(self,*args):
         cmd_split = args[0].split()
         if len(cmd_split) == 1:
@@ -261,6 +273,25 @@ class FtpClient(object):
         if len(cmd_split) == 1:
             cmd_res = os.getcwd()
             print(cmd_res)
+
+    def cmd_chdir(self,*args):
+        cmd_split = args[0].split()
+        dirname = cmd_split[1]
+        if len(cmd_split) > 1:
+            msg_dic = {
+                "action": "chdir",
+                "dirname":dirname
+            }
+            self.client.send(json.dumps(msg_dic).encode("utf-8"))
+            cmd_res = self.client.recv(1024)
+            print(cmd_res.decode())
+
+    def cmd_lchdir(self,*args):
+        cmd_split = args[0].split()
+        if len(cmd_split) > 1:
+            dirname = cmd_split[1]
+            os.chdir(dirname)
+            print(os.getcwd())
 
 if __name__ == "__main__":
     try:
