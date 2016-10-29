@@ -280,8 +280,8 @@ class FtpClient(object):
 
     def cmd_chdir(self,*args):
         cmd_split = args[0].split()
-        dirname = cmd_split[1]
         if len(cmd_split) > 1:
+            dirname = cmd_split[1]
             msg_dic = {
                 "action": "chdir",
                 "dirname":dirname
