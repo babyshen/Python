@@ -47,10 +47,10 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def get(self, *args):
         cmd_dic = args[0]
         filename = cmd_dic["filename"]
-        filesize = os.stat(filename).st_size
-        print(filename)
-        self.request.send(str(filesize).encode("utf-8"))# send file size
         if os.path.isfile(filename):
+            filesize = os.stat(filename).st_size
+            print(filename)
+            self.request.send(str(filesize).encode("utf-8"))# send file size
             f = open(filename,'rb')
             m = hashlib.md5()
             for line in f:
@@ -59,7 +59,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             print("file md5", m.hexdigest())
             f.close()
             self.request.send(m.hexdigest().encode("utf-8"))  # send md5
-        print("send done...")
+            print("send done...")
+        else:
+            self.request.send("not_exist".encode("utf-8"))
 
     def list(self,cmd_res):
         self.request.send(str(len(cmd_res)).encode("utf-8")) # 先发大小给客户端
@@ -199,30 +201,33 @@ class FtpClient(object):
         self.client.send(json.dumps(msg_dic).encode("utf-8"))
         #  防止粘包，等待服务器确认
         server_response = self.client.recv(1024)
-        file_total_size = int(server_response.decode())
-        received_size = 0
-        if os.path.isfile(filename):
-            f = open(filename+".new",'wb')
+        if server_response.decode() != "not_exist":
+            file_total_size = int(server_response.decode())
+            received_size = 0
+            if os.path.isfile(filename):
+                f = open(filename+".new",'wb')
+            else:
+                f = open(filename, 'wb')
+            m = hashlib.md5()
+            while received_size < file_total_size:
+                if file_total_size - received_size > 1024:  # 要收不止一次
+                    size = 1024
+                else:  # 最后一次，剩多少收多少
+                    size = file_total_size - received_size
+                data = self.client.recv(size)
+                received_size += len(data)
+                m.update(data)
+                f.write(data)
+                # print(file_total_size,received_size)
+            else:
+                new_file_md5 = m.hexdigest()
+                print("file recv done...")
+            f.close()
+            server_file_md5 = self.client.recv(1024)
+            print("server file md5:", server_file_md5.decode())
+            print("client file md5:", new_file_md5)
         else:
-            f = open(filename, 'wb')
-        m = hashlib.md5()
-        while received_size < file_total_size:
-            if file_total_size - received_size > 1024:  # 要收不止一次
-                size = 1024
-            else:  # 最后一次，剩多少收多少
-                size = file_total_size - received_size
-            data = self.client.recv(size)
-            received_size += len(data)
-            m.update(data)
-            f.write(data)
-            # print(file_total_size,received_size)
-        else:
-            new_file_md5 = m.hexdigest()
-            print("file recv done...")
-        f.close()
-        server_file_md5 = self.client.recv(1024)
-        print("server file md5:", server_file_md5.decode())
-        print("client file md5:", new_file_md5)
+            print(filename, "is not exist")
 
     def cmd_ls(self, *args):
         cmd_split = args[0].split()
