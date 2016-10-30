@@ -37,7 +37,7 @@ def daemon (stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     for f in sys.stdout, sys.stderr: f.flush()  
     si = open(stdin, 'r')  
     so = open(stdout, 'a+')  
-    se = open(stderr, 'a+', 0)  
+    se = open(stderr, 'a+')  
     os.dup2(si.fileno(), sys.stdin.fileno())    #dup2函数原子化关闭和复制文件描述符  
     os.dup2(so.fileno(), sys.stdout.fileno())  
     os.dup2(se.fileno(), sys.stderr.fileno())  
