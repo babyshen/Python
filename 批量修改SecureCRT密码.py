@@ -18,6 +18,6 @@ def CRT_Path(path,*args,**kwargs):
             f2.close()
 
 if __name__ == '__main__':
-    path='C:\program1\CRT\conf\Sessions\VMware'  # Seesions 路径
+    path = 'C:\program1\CRT\conf\Sessions\VMware'  # Seesions 路径
     CRT_Path(path)
     
