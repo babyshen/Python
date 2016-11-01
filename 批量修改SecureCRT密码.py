@@ -11,10 +11,14 @@ def CRT_Path(path,*args,**kwargs):
             alllines = f1.readlines()
             f1.close()
             f2 = open(fullname, 'w',encoding="utf-8")
-            p = re.compile(r'"Password V2"=(.*)')
-            for eachline in alllines:
-                a = re.sub(p,'"Password V2"=加密后的字符串',eachline)
-                f2.writelines(a)
+            if 'babyshen' in alllines[0]:  # 判断用户名是否是babyshen（可根据需要修改）
+                for eachline in alllines:
+                    a = re.sub(r'"Password V2"=(.*)','"Password V2"=加密字符串',eachline)
+                    f2.writelines(a)
+            if 'root' in alllines[0]: #判断用户名是否是root（可根据需要修改），有其他继续添加就行
+                for eachline in alllines:
+                    a = re.sub(r'"Password V2"=(.*)','"Password V2"=加密字符串',eachline)
+                    f2.writelines(a)
             f2.close()
 
 if __name__ == '__main__':
