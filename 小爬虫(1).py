@@ -1,3 +1,5 @@
+# python 2 版本
+
 #!/usr/bin/env python
 # 
 import re
