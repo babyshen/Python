@@ -1,8 +1,7 @@
-#!/usr/bin/env python
+#利用python批量修改SecureCRT会话密码
 # -*- coding:utf-8 -*-
-'''批量修改SecureCRT密码'''
 import os,re
-
+ 
 def CRT_Path(path,*args,**kwargs):
     for (dirpath, dirnames, filenames) in os.walk(path):
         for file in filenames:
@@ -11,19 +10,22 @@ def CRT_Path(path,*args,**kwargs):
             alllines = f1.readlines()
             f1.close()
             f2 = open(fullname, 'w',encoding="utf-8")
-            if 'babyshen' in alllines[0]:  # 判断用户名是否是babyshen（可根据需要修改）
+            pw_r = re.compile(r'("Password V2"=)(.*)')
+            if 'admin' in alllines[0]:  # 判断用户名是否是admin（可根据需要修改）
                 for eachline in alllines:
-                    a = re.sub(r'("Password V2"=)(.*)','\g<1>加密字符串',eachline)
+                    a = re.sub(pw_r,'\g<1>'+admin_pwd,eachline)
                     f2.writelines(a)
             elif 'root' in alllines[0]: #判断用户名是否是root（可根据需要修改），有其他继续添加就行
                 for eachline in alllines:
-                    a = re.sub(r'("Password V2"=)(.*)','\g<1>加密字符串',eachline)
+                    a = re.sub(pw_r,'\g<1>'+root_pwd,eachline)
                     f2.writelines(a)
             else:
                 f2.writelines(alllines)
             f2.close()
-
+ 
 if __name__ == '__main__':
-    path = 'C:\program1\CRT\conf\Sessions\VMware'  # Seesions 路径
-    CRT_Path(path)
-    
+    # admin 密码加密字符串
+    admin_pwd = 'xxooxxoo'
+    # root 密码加密字符串
+    root_pwd = 'xxooxxooxxoo'
+    path = r'C:\Users\root\Desktop\Sessions'  # CRT Seesions 路径
