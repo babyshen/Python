@@ -29,3 +29,4 @@ if __name__ == '__main__':
     # root 密码加密字符串
     root_pwd = 'xxooxxooxxoo'
     path = r'C:\Users\root\Desktop\Sessions'  # CRT Seesions 路径
+    CRT_Path(path)
