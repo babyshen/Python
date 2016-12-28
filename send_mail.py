@@ -32,7 +32,7 @@ def send_mail(server, fro, to, subject="", text="", files=[]):
         msg.attach(part)
 
     smtp = smtplib.SMTP()
-    # smtp = smtplib.SMTP_SSl()  # 使用SSL的方式去登录(例如QQ邮箱，端口是465)
+    # smtp = smtplib.SMTP_SSL()  # 使用SSL的方式去登录(例如QQ邮箱，端口是465)
     smtp.connect(server['name']) # connect有两个参数，第一个为邮件服务器，第二个为端口，默认是25
     smtp.login(server['user'], server['passwd']) # 用户名，密码
     smtp.sendmail(fro, to, msg.as_string()) # 发件人，收件人，发送信息(这里的发件人和收件人才是真正的发件人和收件人)
