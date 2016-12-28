@@ -25,7 +25,8 @@ def send_mail(server, fro, to, subject="", text="", files=[]):
 
     for file in files:          # 添加附件可以是多个，files是一个列表，可以为空
         part = MIMEBase('application', 'octet-stream') #'octet-stream': binary data
-        part.set_payload(open(file, 'rb').read())
+        with open(file,'rb') as f:
+            part.set_payload(f.read())
         encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(file))
         msg.attach(part)
