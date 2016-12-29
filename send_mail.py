@@ -16,7 +16,7 @@ def send_mail(server, fro, to, subject="", text="", files=[]):
     assert type(files) == list
 
     msg = MIMEMultipart()
-    msg['From'] = fro                # 注意：邮件的发件人(这里并不是真正发件人，是收到邮件显示的发件人，你想到了什么？？)
+    msg['From'] = fro                # 邮件的发件人
     msg['Subject'] = subject         # 邮件的主题
     msg['To'] = COMMASPACE.join(to)  # COMMASPACE==', ' 收件人可以是多个，to是一个列表
     msg['Date'] = formatdate(localtime=True) # 发送时间，当不设定时，用outlook收邮件会不显示日期，QQ网页邮箱会显示日期
@@ -35,9 +35,9 @@ def send_mail(server, fro, to, subject="", text="", files=[]):
     # smtp = smtplib.SMTP_SSL()  # 使用SSL的方式去登录(例如QQ邮箱，端口是465)
     smtp.connect(server['name']) # connect有两个参数，第一个为邮件服务器，第二个为端口，默认是25
     smtp.login(server['user'], server['passwd']) # 用户名，密码
-    smtp.sendmail(fro, to, msg.as_string()) # 发件人，收件人，发送信息(这里的发件人和收件人才是真正的发件人和收件人)
+    smtp.sendmail(fro, to, msg.as_string()) # 发件人，收件人，发送信息，fro传什么值，发件人就是谁
     smtp.close()  # 关闭连接
-
+    
 text = '''
    呵呵哒
    test'''
