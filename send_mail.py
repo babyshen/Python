@@ -38,11 +38,12 @@ def send_mail(server, fro, to, subject="", text="", files=[]):
     smtp.sendmail(fro, to, msg.as_string()) # 发件人，收件人，发送信息，fro传什么值，发件人就是谁
     smtp.close()  # 关闭连接
     
-text = '''
-   呵呵哒
-   test'''
-send_mail({'name':'xxx','user':'oooo','passwd':'xxxooo'},
-          'xxx',
-          ['xo','ox'],
-          '呵呵哒01',
-          text)
+if __name__ == '__main__':
+    server = {'name':'xxx.163.com',
+              'user':'babyshen',
+              'passwd':'xxoo'}
+    fro = 'xxoo'
+    to = ['xxx']
+    subject = 'test002'
+    text = '''test000002'''
+    send_mail(server,fro,to,subject,text)
