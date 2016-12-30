@@ -91,6 +91,7 @@ if __name__ == '__main__':
         fro = 'xxx'              # 邮件的发件人
         to = ['xxoo']            # 邮件的收件人
         subject = 'ping_test'    # 邮件的主题
+        if len(textmail.split('\n')) == 2 : sys.exit() # 当只有一行是退出程序不发送邮件
         send_mail(server,fro,to,subject,textmail)
     except smtplib.SMTPAuthenticationError:
         sys.exit("Mail Authentication Failed")
