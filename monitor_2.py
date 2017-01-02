@@ -103,7 +103,7 @@ def args_parser(file,outfile):
     parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('-f','--file',default=file,dest='file',help="netmon file, default: "+file)
     parser.add_argument('-o','--outfile',default=outfile,dest='outfile',help="output file, default: "+outfile)
-    parser.add_argument('-d','--daemon',action='store_const',const='daemon',help="daemon mode, fork into background")
+    parser.add_argument('-d','--daemon',action='store_true',dest='daemon',help="daemon mode, fork into background")
     args = parser.parse_args()
     return args.file,args.outfile,args.daemon
 
