@@ -115,15 +115,15 @@ if __name__ == '__main__':
         file ,outfile,dflag = args_parser(file,outfile)
         if dflag : daemon() # 如果daemon flag为真，即有-d/--daemon参数，则运行daemon mode
         # print(file,outfile,dflag)
+        server = {'name':'xxx',
+                  'user':'ooo',
+                  'passwd':''}
+        fro = 'xxoo'
+        to = ['ooxx']
+        subject = 'ping_test'
         while True:
-            textmail = ping_res(file,outfile)
+            textmail = ping_res(file, outfile)
             # print(textmail) # 可以用来输出邮件内容
-            server = {'name':'xxx',
-                      'user':'ooo',
-                      'passwd':''}
-            fro = 'xxoo'
-            to = ['ooxx']
-            subject = 'ping_test'
             if len(textmail.split('\n')) == 2 : sys.exit() # 当只有一行时退出程序不发送邮件
             send_mail(server,fro,to,subject,textmail)
             time.sleep(300)
