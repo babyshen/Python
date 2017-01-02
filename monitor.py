@@ -67,7 +67,7 @@ def ping_res(file,revfile):
                 host = line.split()[0]
                 src = line.split()[1]
                 dest = line.split()[2]
-                threshold = line.split()[3] if len(line.split()) == 3 else 100
+                threshold = line.split()[3] if len(line.split()) == 4 else 100
                 loss, rtt = ping_test(src, dest)
                 text = '%-15s %-15s %-15s %-5s %-5s \n' % (host, src, dest, loss, rtt)
                 f1.write(text)     # 将ping结果写到rev文件中
