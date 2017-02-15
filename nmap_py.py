@@ -24,7 +24,7 @@ def socket_port(ip, PORT):
         s.close()
 
 def start_scan(IP):
-    for port in range(0, 100+1):
+    for port in range(0, 65535+1):
         threading.Thread(target=socket_port, args=(IP, int(port))).start()
         time.sleep(0.006)
 
