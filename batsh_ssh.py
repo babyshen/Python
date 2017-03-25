@@ -3,6 +3,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+__author__  = 'babyshen'
+__version__ = '1.0.0'
+
 import paramiko
 
 class SSh(object):
