@@ -9,7 +9,8 @@ import socket
 import threading
 import time
 import argparse
-import ipaddress
+import ipaddressimp
+import sys
 
 openPortNum = 0
 socket.setdefaulttimeout(3)
@@ -36,13 +37,16 @@ def args_parser():
     return args.ip
 
 if __name__ == '__main__':
-    args = args_parser()
-    t = time.time()
-    for i in args:
-        try:
-            ipaddress.ip_address(i)
-            start_scan(i)
-            print()
-        except ValueError as e:
-            print(e,'\n')
-    print('total open port is %s, scan used time is: %f' %(openPortNum, time.time()-t))
+   try:
+        args = args_parser()
+        t = time.time()
+        for i in args:
+            try:
+                ipaddress.ip_address(i)
+                start_scan(i)
+                print()
+            except ValueError as e:
+                print(e,'\n')
+        print('total open port is %s, scan used time is: %f' %(openPortNum, time.time()-t))
+    except KeyboardInterrupt as e :
+        sys.exit('Ctrl-c')
