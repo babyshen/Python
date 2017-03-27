@@ -48,5 +48,5 @@ if __name__ == '__main__':
             except ValueError as e:
                 print(e,'\n')
         print('total open port is %s, scan used time is: %f' %(openPortNum, time.time()-t))
-    except KeyboardInterrupt as e :
+    except KeyboardInterrupt:
         sys.exit('Ctrl-c')
