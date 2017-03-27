@@ -7,6 +7,7 @@ __author__  = 'babyshen'
 __version__ = '1.0.0'
 
 import paramiko
+from collections import OrderedDict
 
 class SSh(object):
     def __init__(self,port,username,password):
@@ -26,11 +27,12 @@ class SSh(object):
         ssh.close()
 
 if __name__ == '__main__':
-    client   = {'host1':'1.1.1.1',
-                'host2':'2.2.2.2',
-                'host3':'3.3.3.3',
-                'host4':'4.4.4.4',
-              }               # 主机列表 ，hostname:ip
+    client   = OrderedDict([
+        ('host1','1.1.1.1'),
+        ('host2','2.2.2.2'),
+        ('host3','3.3.3.3'),
+        ('host4','4.4.4.4'),
+    ])                        # 主机列表 ，hostname:ip
     port     = 22             # 端口号
     username = 'root'         # 用户名
     password = '123456789'    # 密码
