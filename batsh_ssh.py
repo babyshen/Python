@@ -45,6 +45,9 @@ if __name__ == '__main__':
         try:
             ssh.ssh_con(host,ip,cmd)
         except WindowsError:
-            print('\033[31;1m%s %s %s \033[0m\n' %(host,ip,'连接尝试失败'))
+            print('\033[31;1m%s %s %s \033[0m\n' %(host,ip,'连接尝试失败!'))
+        except paramiko.ssh_exception.AuthenticationException as e:
+            print('\033[31;1m%s %s %s \033[0m\n' %(host, ip, '身份验证失败!'))
         except Exception as e:
             print(e)
+            
