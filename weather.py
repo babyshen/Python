@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-# 查询天气预报，py3
+# 查询天气预报
 
 import urllib.request
 import json
@@ -2595,24 +2595,18 @@ weather = {
     '新港':'101340904',
 }
 
-def get_weather(city):
-    citydode = weather.get(city)
-    if citydode is None:
-        sys.exit("%s is not exits" %city)
-    url = 'http://www.weather.com.cn/data/sk/' + citydode + '.html'
+def get_weather(citycode):
+    url = 'http://www.weather.com.cn/data/sk/' + citycode + '.html'
     html = urllib.request.urlopen(url).read().decode()
     return html
 
-def get_weatherday(city):
-    citydode = weather.get(city)
-    if citydode is None:
-        sys.exit("%s is not exits" %city)
-    url = 'http://www.weather.com.cn/data/cityinfo/' + citydode + '.html'
+def get_weatherday(citycode):
+    url = 'http://www.weather.com.cn/data/cityinfo/' + citycode + '.html'
     html = urllib.request.urlopen(url).read().decode()
     return html
 
-def time_weather(city):
-    result = json.loads(get_weather(city)).get('weatherinfo')
+def time_weather(citycode):
+    result = json.loads(get_weather(citycode)).get('weatherinfo')
     print('城市名称: ',result.get('city'))
     print('城市代码: ',result.get('cityid'))
     print('更新时间: ', result.get('time'))
@@ -2622,17 +2616,20 @@ def time_weather(city):
     print('湿   度: ', result.get('SD'))
 
 
-def day_weather(city):
-    resultday = json.loads(get_weatherday(city)).get('weatherinfo')
+def day_weather(citycode):
+    resultday = json.loads(get_weatherday(citycode)).get('weatherinfo')
     print('最低温度: ', resultday.get('temp1'))
     print('最高温度: ', resultday.get('temp2'))
     print('天气状况: ', resultday.get('weather'))
 
 def _main(city):
-    time_weather(city)
-    day_weather(city)
+    citycode = weather.get(city)
+    if citycode is None:
+        sys.exit("您输入的城市【 %s 】不存在" %city)
+    time_weather(citycode)
+    day_weather(citycode)
 
 if __name__ == '__main__':
-    _main('昌平')
+    _main('北京')
 
 
