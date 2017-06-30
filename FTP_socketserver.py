@@ -11,7 +11,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import socketserver,json,os,hashlib,sys
+import socketserver
+import json
+import os
+import hashlib
+import sys
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
@@ -126,7 +130,11 @@ if __name__ == "__main__":
 # -*- coding:utf-8 -*-
 
 
-import socket, os, json, hashlib, sys
+import socket
+import os
+import json
+inmport hashlib
+import sys
 
 
 class FtpClient(object):
@@ -137,8 +145,8 @@ class FtpClient(object):
         msg = '''
         ls  # list server file
         lls # list client file
-        gwd
-        lgwd
+        pwd
+        lpw
         chdir dirname
         lchdir dirname
         get filename
