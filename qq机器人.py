@@ -13,25 +13,27 @@ def weather(city):
     html = requests.get(url)
     result = json.loads(html.text)
     if result.get('status') != 200:
-        return city + ' 不存在！'
+        return "暂无【%s】天气预报！" %city
     res = result.get('data').get('forecast')
     for i in res:
-        r += '\r\n' + i.get('date')+' '+ i.get('type')+' '+ i.get('low')+' '+ i.get('high')+' '+ i.get('fengli')+' '+ i.get('fengxiang')
+        r += '\r\n' + i.get('date') + ' ' + i.get('type') + ' ' + i.get('low') + ' ' + i.get('high') + ' ' + i.get(
+            'fengli') + ' ' + i.get('fengxiang')
     return r
 
+
 @qqbot.QQBotSlot
-def onQQMessage(bot,contact,member,content):
-    if "baby神" in content:
-        con = '干啥？？'
+def onQQMessage(bot, contact, member, content):
+    if "@ME" in content:
+        con = '圈我干啥？？'
         bot.SendTo(contact, con)
     elif "hello" in content:
         con = "你好啊！"
-        bot.SendTo(contact,con)
+        bot.SendTo(contact, con)
     elif "#study#" in content and len(content.split()) >= 3:
-        key,*value = content.split()[1:]
+        key, *value = content.split()[1:]
         mess[key] = value
         con = "录入成功！"
-        json.dump(mess, open('qq.txt','w'))
+        json.dump(mess, open('qq.txt', 'w'))
         bot.SendTo(contact, con)
     elif "#get#" in content and len(content.split()) >= 2:
         key = content.split()[1]
@@ -40,6 +42,7 @@ def onQQMessage(bot,contact,member,content):
     elif "#weather#" in content and len(content.split()) >= 2:
         con = weather(content.split()[1])
         bot.SendTo(contact, con)
+
 
 if __name__ == '__main__':
     qqbot.RunBot()
