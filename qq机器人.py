@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+# 已加入天气预报，翻译，学习，后续会继续扩展添加
 import random
 import hashlib
 import requests
