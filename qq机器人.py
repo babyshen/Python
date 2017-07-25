@@ -9,7 +9,7 @@ mess = json.load(open('qq.txt', 'r'))
 
 
 def weather(city):
-    r = ""
+    r = city
     url = 'http://www.sojson.com/open/api/weather/json.shtml?city=' + city
     html = requests.get(url)
     result = json.loads(html.text)
