@@ -68,6 +68,11 @@ def onQQMessage(bot, contact, member, content):
         word = ' '.join(content.split()[1:])
         con = translate(word)
         bot.SendTo(contact, con)
+    elif content.startswith('#show#'):
+        con = ""
+        for i in mess:
+            con += i + ':' + str(mess[i]) + '\r\n'
+        bot.SendTo(contact, con)
 
 
 if __name__ == '__main__':
