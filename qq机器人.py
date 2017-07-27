@@ -26,8 +26,8 @@ def weather(city):
 
 
 def translate(word):
-    appid = 'xxoo'
-    secretKey = 'ooxx'
+    appid = 'xxoo' # 去百度翻译api申请
+    secretKey = 'ooxx' # 去百度翻译api申请
 
     myurl = 'http://api.fanyi.baidu.com/api/trans/vip/translate'
     fromLang = 'auto'
