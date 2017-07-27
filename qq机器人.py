@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # 已加入天气预报，翻译，学习，后续会继续扩展添加
+# qqbot 详细介绍 https://github.com/pandolia/qqbot/
+
 import random
 import hashlib
 import requests
