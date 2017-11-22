@@ -9,7 +9,7 @@ import socket
 import threading
 import time
 import argparse
-import ipaddressimp
+import ipaddress
 import sys
 
 openPortNum = 0
