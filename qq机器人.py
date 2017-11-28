@@ -9,7 +9,14 @@ import requests
 import qqbot
 import json
 
-mess = json.load(open('qq.txt', 'r'))
+file = 'qq.txt'
+
+if os.path.exists(file):
+    mess = json.load(open(file, 'r'))
+else:
+    with open(file,'w') as f:
+        f.write('{}')
+    mess = json.load(open(file, 'r'))
 
 
 def weather(city):
