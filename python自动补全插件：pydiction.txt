@@ -1,41 +1,41 @@
-vim python×Ô¶¯²¹È«²å¼ş£ºpydiction
-¿ÉÒÔÊµÏÖÏÂÃæpython´úÂëµÄ×Ô¶¯²¹È«£º
-1.¼òµ¥python¹Ø¼ü´Ê²¹È« 
-2.python º¯Êı²¹È«´øÀ¨ºÅ 
-3.python Ä£¿é²¹È« 
-4.python Ä£¿éÄÚº¯Êı£¬±äÁ¿²¹È« 
-5.from module import sub-module ²¹È«
+vim pythonè‡ªåŠ¨è¡¥å…¨æ’ä»¶ï¼špydiction
+å¯ä»¥å®ç°ä¸‹é¢pythonä»£ç çš„è‡ªåŠ¨è¡¥å…¨ï¼š
+1.ç®€å•pythonå…³é”®è¯è¡¥å…¨ 
+2.python å‡½æ•°è¡¥å…¨å¸¦æ‹¬å· 
+3.python æ¨¡å—è¡¥å…¨ 
+4.python æ¨¡å—å†…å‡½æ•°ï¼Œå˜é‡è¡¥å…¨ 
+5.from module import sub-module è¡¥å…¨
 
-ÏëÎªvimÆô¶¯×Ô¶¯²¹È«ĞèÒªÏÂÔØ²å¼ş£¬µØÖ·ÈçÏÂ£º
+æƒ³ä¸ºvimå¯åŠ¨è‡ªåŠ¨è¡¥å…¨éœ€è¦ä¸‹è½½æ’ä»¶ï¼Œåœ°å€å¦‚ä¸‹ï¼š
 http://vim.sourceforge.net/scripts/script.php?script_id=850
-https://github.com/rkulla/pydiction
+https://github.com/babyshen/pydiction
 
-°²×°ÅäÖÃ£º
-wget https://github.com/rkulla/pydiction/archive/master.zip
+å®‰è£…é…ç½®ï¼š
+wget https://github.com/babyshen/pydiction/archive/master.zip
 unzip -q master
 mv pydiction-master pydiction
 mkdir -p ~/.vim/tools/pydiction
 cp -r pydiction/after ~/.vim
 cp pydiction/complete-dict ~/.vim/tools/pydiction
 
-È·±£ÎÄ¼ş½á¹¹ÈçÏÂ£º
+ç¡®ä¿æ–‡ä»¶ç»“æ„å¦‚ä¸‹ï¼š
 # tree ~/.vim
 /root/.vim
-©À©¤©¤ after
-©¦   ©¸©¤©¤ ftplugin
-©¦       ©¸©¤©¤ python_pydiction.vim
-©¸©¤©¤ tools
-    ©¸©¤©¤ pydiction
-        ©¸©¤©¤ complete-dict
+â”œâ”€â”€ after
+â”‚   â””â”€â”€ ftplugin
+â”‚       â””â”€â”€ python_pydiction.vim
+â””â”€â”€ tools
+    â””â”€â”€ pydiction
+        â””â”€â”€ complete-dict
 
-´´½¨~/.vimrc,È·±£ÆäÖĞÄÚÈİÈçÏÂ£º
+åˆ›å»º~/.vimrc,ç¡®ä¿å…¶ä¸­å†…å®¹å¦‚ä¸‹ï¼š
 # cat ~/.vimrc
 filetype plugin on
 let g:pydiction_location = '~/.vim/tools/pydiction/complete-dict'
 
 
-python½»»¥Ä£Ê½ÏÂTab×Ô¶¯²¹Æë
-´´½¨ÎÄ¼şÈçÏÂ£º
+pythonäº¤äº’æ¨¡å¼ä¸‹Tabè‡ªåŠ¨è¡¥é½
+åˆ›å»ºæ–‡ä»¶å¦‚ä¸‹ï¼š
 # cat ~/.pythonstartup
 # python startup file
 #!/usr/bin/env python
