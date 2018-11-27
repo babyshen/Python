@@ -20,10 +20,13 @@ else:
 
 
 def weather(city):
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    headers = {'User-agent': user_agent}
+    
     r = city
     url = 'http://www.sojson.com/open/api/weather/json.shtml?city=' + city
     
-    html = requests.get(url)
+    html = requests.get(url,headers=headers)
     result = json.loads(html.text)
     if result.get('status') != 200:
         return "暂无【%s】天气预报！" % city
