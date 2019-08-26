@@ -19,7 +19,7 @@ def get_json(url):
     return results
 
 
-def get_results():
+def get_results(url):
     results = get_json(url)
     for i in results["results"]:
         print("%-20s %.2fMB" % (i["name"], i["full_size"] / 1000000))
@@ -41,8 +41,8 @@ if __name__ == '__main__':
         exit(1)
 
     image = argv[1] if '/' in argv[1] else 'library/' + argv[1]
-    url = "https://hub.docker.com/v2/repositories/" + image + "/tags/?page_size=100"
+    image_url = "https://hub.docker.com/v2/repositories/" + image + "/tags/?page_size=100"
     try:
-        get_results()
+        get_results(image_url)
     except KeyError:
         exit('Please enter the correct image name! ')
